@@ -1,4 +1,7 @@
-﻿namespace TestGeniusOrIdiot
+﻿//ДЗ№1 - выполнено
+//ДЗ№2 - на проверке
+
+namespace TestGeniusOrIdiot
 {
     internal class Program
     {
@@ -39,7 +42,7 @@
         {
             CustomConsole.Title("РЕГИСТРАЦИЯ");
 
-            string name = null;
+            string name = default;
 
             while (true)
             {
