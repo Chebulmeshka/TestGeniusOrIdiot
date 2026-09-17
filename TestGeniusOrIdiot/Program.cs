@@ -1,7 +1,4 @@
-﻿//ДЗ№1 - выполнено
-//ДЗ№2 - на проверке
-
-namespace TestGeniusOrIdiot
+﻿namespace TestGeniusOrIdiot
 {
     internal class Program
     {
@@ -20,8 +17,7 @@ namespace TestGeniusOrIdiot
                 int countRigthAnswers = TestUser(user, questions);
 
                 //Диагноз пользователю
-                Diagnosis diagnosis = MakeDiagnosis(countRigthAnswers);
-                user.SetDiagnosis(diagnosis);
+                user.Diagnosis = SetDiagnosis(countRigthAnswers);
 
                 //Вывод диагноза пользователя в консоль
                 PrintDiagnosis(user);
@@ -51,11 +47,11 @@ namespace TestGeniusOrIdiot
 
                 if (IsNameCorrect(name))
                 {
-                    CustomConsole.MessageLine("Некорректное имя. Попробуйте снова.");
+                    break;
                 }
                 else
                 {
-                    break;
+                    CustomConsole.MessageLine("Некорректное имя. Попробуйте снова.");
                 }
             }
             CustomConsole.Clear();
@@ -73,7 +69,7 @@ namespace TestGeniusOrIdiot
         static bool IsNameCorrect(string name)
         {
             string nameWithoutSpaces = name.Replace(" ", "");
-            return string.IsNullOrEmpty(nameWithoutSpaces);
+            return !string.IsNullOrEmpty(nameWithoutSpaces);
         }
 
         /// <summary>
@@ -102,7 +98,7 @@ namespace TestGeniusOrIdiot
 
                     try
                     {
-                        if (question.IsAnswerRigth(answer)) countRigthAnswers++;
+                        if (IsAnswerRigth(question, answer)) countRigthAnswers++;
                         break;
                     }
                     catch(Exception ex)
@@ -131,18 +127,20 @@ namespace TestGeniusOrIdiot
             CustomConsole.MessageLine("Если вы считаете что этот тест с вами был несправедлив, " +
                 "вы можете взять реванш.");
 
-            while (true)
+            string answer = GetAnswer(user).ToLower();
+            while (answer != "да" && answer != "нет")
             {
-                CustomConsole.MessageLine("Да - начать ещё раз");
-                CustomConsole.MessageLine("Нет - выйти");
-                string answer = GetAnswer(user);
-
-                CustomConsole.SkipLine();
-                if (answer.Equals("да")) return true;
-                if(answer.Equals("нет")) return false;
+                CustomConsole.Clear();
 
                 CustomConsole.ErrorLine("Не понял вас. Выберете ответ из следующих вариантов:");
+                CustomConsole.MessageLine("Да - начать ещё раз");
+                CustomConsole.MessageLine("Нет - выйти");
+
+                answer = GetAnswer(user).ToLower();
             }
+
+            CustomConsole.Clear();
+            return answer == "да";
         }
 
         /// <summary>
@@ -157,9 +155,18 @@ namespace TestGeniusOrIdiot
         /// <summary>
         /// Определение диагноза по количеству ответов
         /// </summary>
-        static Diagnosis MakeDiagnosis(int countRigthAnswers)
+        static string SetDiagnosis(int countRigthAnswers)
         {
-            return (Diagnosis)countRigthAnswers;
+            switch (countRigthAnswers)
+            {
+                case 0: return "Идиот";
+                case 1: return "Кретин";
+                case 2: return "Дурак";
+                case 3: return "Нормальный";
+                case 4: return "Талант";
+                case 5: return "Гений";
+                default: return "Если вы это видите, то дураком является разработчик";
+            }
         }
 
         /// <summary>
@@ -207,6 +214,20 @@ namespace TestGeniusOrIdiot
         {
             CustomConsole.Message($"{user.Name}: ");
             return CustomConsole.ReadInput() ?? "";
+        }
+
+        /// <summary>
+        /// Проверка на правильность ответа
+        /// </summary>
+        /// <returns>
+        /// true - если ответ правильный. false - если ответ не правильный. Регистр имеет значение.
+        /// </returns>
+        static bool IsAnswerRigth(Question question, string answer)
+        {
+            if (question.IsDigitAnswer && !int.TryParse(answer, out _))
+                throw new ArgumentException("Этот вопрос подрузамевает числовой ответ. Пожалуйста, введите число!");
+
+            return answer.Equals(question.Answer);
         }
     }
 }
