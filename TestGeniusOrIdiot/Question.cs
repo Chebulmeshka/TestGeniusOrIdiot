@@ -6,30 +6,16 @@ namespace TestGeniusOrIdiot
 {
     internal class Question
     {
-        private string _text;
-        private string _answer;
-        private bool _isDigitAnswer = false;
+        public string Text { get; private set; }
+        public string Answer { get; private set; }
+        public bool IsDigitAnswer { get; private set; } = false;
         
         public Question(string text, string answer)
         {
-            _text = text;
-            _answer = answer;
+            Text = text;
+            Answer = answer;
 
-            _isDigitAnswer = int.TryParse(answer, out _);
-        }
-
-        /// <summary>
-        /// Проверка на правильность ответа
-        /// </summary>
-        /// <returns>
-        /// true - если ответ правильный. false - если ответ не правильный. Регистр имеет значение.
-        /// </returns>
-        public bool IsAnswerRigth(string answer)
-        {
-            if (_isDigitAnswer && !int.TryParse(answer, out _))
-                throw new ArgumentException("Этот вопрос подрузамевает числовой ответ. Пожалуйста, введите число!");
-
-            return answer.Equals(_answer);
+            IsDigitAnswer = int.TryParse(answer, out _);
         }
 
         /// <summary>
@@ -40,7 +26,7 @@ namespace TestGeniusOrIdiot
         /// </returns>
         public override string ToString()
         {
-            return _text;
+            return Text;
         }
     }
 }

@@ -4,21 +4,22 @@
     {
         static void Main(string[] args)
         {
+            //Формироване уникального списка вопросов для пользователя
+            List<Question> questions = GetDefaultQuestions();
+
             //Регистрация пользователя
             User user = RegistrationNewUser();
 
             while (true)
             {
-                //Формироване уникального списка вопросов для пользователя
-                List<Question> questions = GetDefaultQuestions();
+                //Перемешивание вопросов
                 ShuffleQuestions(questions);
 
                 //Тестирование пользователя
                 int countRigthAnswers = TestUser(user, questions);
 
                 //Диагноз пользователю
-                Diagnosis diagnosis = MakeDiagnosis(countRigthAnswers);
-                user.SetDiagnosis(diagnosis);
+                user.Diagnosis = SetDiagnosis(countRigthAnswers, questions.Count);
 
                 //Вывод диагноза пользователя в консоль
                 PrintDiagnosis(user);
@@ -39,7 +40,7 @@
         {
             CustomConsole.Title("РЕГИСТРАЦИЯ");
 
-            string name = null;
+            string name = default;
 
             while (true)
             {
@@ -48,11 +49,11 @@
 
                 if (IsNameCorrect(name))
                 {
-                    CustomConsole.MessageLine("Некорректное имя. Попробуйте снова.");
+                    break;
                 }
                 else
                 {
-                    break;
+                    CustomConsole.MessageLine("Некорректное имя. Попробуйте снова.");
                 }
             }
             CustomConsole.Clear();
@@ -70,7 +71,7 @@
         static bool IsNameCorrect(string name)
         {
             string nameWithoutSpaces = name.Replace(" ", "");
-            return string.IsNullOrEmpty(nameWithoutSpaces);
+            return !string.IsNullOrEmpty(nameWithoutSpaces);
         }
 
         /// <summary>
@@ -99,7 +100,7 @@
 
                     try
                     {
-                        if (question.IsAnswerRigth(answer)) countRigthAnswers++;
+                        if (IsAnswerRigth(question, answer)) countRigthAnswers++;
                         break;
                     }
                     catch(Exception ex)
@@ -128,18 +129,20 @@
             CustomConsole.MessageLine("Если вы считаете что этот тест с вами был несправедлив, " +
                 "вы можете взять реванш.");
 
-            while (true)
+            string answer = GetAnswer(user).ToLower();
+            while (answer != "да" && answer != "нет")
             {
-                CustomConsole.MessageLine("Да - начать ещё раз");
-                CustomConsole.MessageLine("Нет - выйти");
-                string answer = GetAnswer(user);
-
-                CustomConsole.SkipLine();
-                if (answer.Equals("да")) return true;
-                if(answer.Equals("нет")) return false;
+                CustomConsole.Clear();
 
                 CustomConsole.ErrorLine("Не понял вас. Выберете ответ из следующих вариантов:");
+                CustomConsole.MessageLine("Да - начать ещё раз");
+                CustomConsole.MessageLine("Нет - выйти");
+
+                answer = GetAnswer(user).ToLower();
             }
+
+            CustomConsole.Clear();
+            return answer == "да";
         }
 
         /// <summary>
@@ -154,9 +157,20 @@
         /// <summary>
         /// Определение диагноза по количеству ответов
         /// </summary>
-        static Diagnosis MakeDiagnosis(int countRigthAnswers)
+        static string SetDiagnosis(int countRigthAnswers, int countQuestions)
         {
-            return (Diagnosis)countRigthAnswers;
+            int numberDiagnosis = (int)Math.Round(countRigthAnswers * 5d / countQuestions);
+
+            switch (numberDiagnosis)
+            {
+                case 0: return "Идиот";
+                case 1: return "Кретин";
+                case 2: return "Дурак";
+                case 3: return "Нормальный";
+                case 4: return "Талант";
+                case 5: return "Гений";
+                default: return "Если вы это видите, то дураком является разработчик";
+            }
         }
 
         /// <summary>
@@ -204,6 +218,32 @@
         {
             CustomConsole.Message($"{user.Name}: ");
             return CustomConsole.ReadInput() ?? "";
+        }
+
+        /// <summary>
+        /// Проверка на правильность ответа
+        /// </summary>
+        /// <returns>
+        /// true - если ответ правильный. false - если ответ не правильный. Регистр имеет значение.
+        /// </returns>
+        static bool IsAnswerRigth(Question question, string answer)
+        {
+            if (question.IsDigitAnswer && !int.TryParse(answer, out _))
+                throw new ArgumentException("Этот вопрос подрузамевает числовой ответ. Пожалуйста, введите число!");
+
+            return answer.Equals(question.Answer);
+        }
+
+        static Question GetNewQuestion(User user)
+        {
+            CustomConsole.Clear();
+            CustomConsole.Question("Введите текст вопроса: ");
+            string textQuestion = GetAnswer(user);
+
+            CustomConsole.Question("Введите ответ на вопрос: ");
+            string textAnswer = GetAnswer(user);
+
+            return new Question(textQuestion, textAnswer);
         }
     }
 }
