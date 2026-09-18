@@ -4,20 +4,22 @@
     {
         static void Main(string[] args)
         {
+            //Формироване уникального списка вопросов для пользователя
+            List<Question> questions = GetDefaultQuestions();
+
             //Регистрация пользователя
             User user = RegistrationNewUser();
 
             while (true)
             {
-                //Формироване уникального списка вопросов для пользователя
-                List<Question> questions = GetDefaultQuestions();
+                //Перемешивание вопросов
                 ShuffleQuestions(questions);
 
                 //Тестирование пользователя
                 int countRigthAnswers = TestUser(user, questions);
 
                 //Диагноз пользователю
-                user.Diagnosis = SetDiagnosis(countRigthAnswers);
+                user.Diagnosis = SetDiagnosis(countRigthAnswers, questions.Count);
 
                 //Вывод диагноза пользователя в консоль
                 PrintDiagnosis(user);
@@ -155,9 +157,11 @@
         /// <summary>
         /// Определение диагноза по количеству ответов
         /// </summary>
-        static string SetDiagnosis(int countRigthAnswers)
+        static string SetDiagnosis(int countRigthAnswers, int countQuestions)
         {
-            switch (countRigthAnswers)
+            int numberDiagnosis = (int)Math.Round(countRigthAnswers * 5d / countQuestions);
+
+            switch (numberDiagnosis)
             {
                 case 0: return "Идиот";
                 case 1: return "Кретин";
@@ -228,6 +232,18 @@
                 throw new ArgumentException("Этот вопрос подрузамевает числовой ответ. Пожалуйста, введите число!");
 
             return answer.Equals(question.Answer);
+        }
+
+        static Question GetNewQuestion(User user)
+        {
+            CustomConsole.Clear();
+            CustomConsole.Question("Введите текст вопроса: ");
+            string textQuestion = GetAnswer(user);
+
+            CustomConsole.Question("Введите ответ на вопрос: ");
+            string textAnswer = GetAnswer(user);
+
+            return new Question(textQuestion, textAnswer);
         }
     }
 }
