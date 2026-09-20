@@ -17,16 +17,5 @@ namespace TestGeniusOrIdiot
 
             IsDigitAnswer = int.TryParse(answer, out _);
         }
-
-        /// <summary>
-        /// Строковое представление вопроса
-        /// </summary>
-        /// <returns>
-        /// Выводит текст вопроса
-        /// </returns>
-        public override string ToString()
-        {
-            return Text;
-        }
     }
 }

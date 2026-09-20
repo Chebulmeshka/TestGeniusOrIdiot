@@ -4,27 +4,20 @@
     {
         static void Main(string[] args)
         {
-            //Формироване уникального списка вопросов для пользователя
-            List<Question> questions = GetDefaultQuestions();
+            var questions = GetDefaultQuestions();
 
-            //Регистрация пользователя
-            User user = RegistrationNewUser();
+            var user = RegistrationNewUser();
 
             while (true)
             {
-                //Перемешивание вопросов
                 ShuffleQuestions(questions);
 
-                //Тестирование пользователя
-                int countRigthAnswers = TestUser(user, questions);
+                var countRigthAnswers = TestUser(user, questions);
 
-                //Диагноз пользователю
                 user.Diagnosis = SetDiagnosis(countRigthAnswers, questions.Count);
 
-                //Вывод диагноза пользователя в консоль
                 PrintDiagnosis(user);
 
-                //Запрос на повторное тестирование
                 CustomConsole.SkipLine();
                 if (!AskUserStartAgain(user)) break;
             }
@@ -40,7 +33,7 @@
         {
             CustomConsole.Title("РЕГИСТРАЦИЯ");
 
-            string name = default;
+            var name = string.Empty;
 
             while (true)
             {
@@ -70,7 +63,7 @@
         /// </returns>
         static bool IsNameCorrect(string name)
         {
-            string nameWithoutSpaces = name.Replace(" ", "");
+            var nameWithoutSpaces = name.Replace(" ", "");
             return !string.IsNullOrEmpty(nameWithoutSpaces);
         }
 
@@ -86,8 +79,8 @@
             CustomConsole.ReadKey();
             CustomConsole.Clear();
 
-            int numberQuestion = 1;
-            int countRigthAnswers = 0;
+            var numberQuestion = 1;
+            var countRigthAnswers = 0;
 
             foreach (var question in questions)
             {
@@ -96,7 +89,7 @@
 
                 while (true)
                 {
-                    string answer = GetAnswer(user);
+                    var answer = GetAnswer(user);
 
                     try
                     {
@@ -129,7 +122,7 @@
             CustomConsole.MessageLine("Если вы считаете что этот тест с вами был несправедлив, " +
                 "вы можете взять реванш.");
 
-            string answer = GetAnswer(user).ToLower();
+            var answer = GetAnswer(user).ToLower();
             while (answer != "да" && answer != "нет")
             {
                 CustomConsole.Clear();
@@ -159,7 +152,7 @@
         /// </summary>
         static string SetDiagnosis(int countRigthAnswers, int countQuestions)
         {
-            int numberDiagnosis = (int)Math.Round(countRigthAnswers * 5d / countQuestions);
+            var numberDiagnosis = (int)Math.Round(countRigthAnswers * 5d / countQuestions);
 
             switch (numberDiagnosis)
             {
@@ -178,11 +171,11 @@
         /// </summary>
         static void ShuffleQuestions(List<Question> questions)
         {
-            Random rand = new Random();
+            var rand = new Random();
 
             for (int i = questions.Count - 1; i > 0; i--)
             {
-                int j = rand.Next(i + 1);
+                var j = rand.Next(i + 1);
 
                 var temp = questions[i];
                 questions[i] = questions[j];
@@ -238,10 +231,10 @@
         {
             CustomConsole.Clear();
             CustomConsole.Question("Введите текст вопроса: ");
-            string textQuestion = GetAnswer(user);
+            var textQuestion = GetAnswer(user);
 
             CustomConsole.Question("Введите ответ на вопрос: ");
-            string textAnswer = GetAnswer(user);
+            var textAnswer = GetAnswer(user);
 
             return new Question(textQuestion, textAnswer);
         }
